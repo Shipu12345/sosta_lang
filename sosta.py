@@ -6,6 +6,7 @@ import io
 from typing import Tuple
 import sys
 
+
 iota_counter = 0
 
 
@@ -62,8 +63,15 @@ def simulate_program(program):
             assert False, "Unreachable"
 
 
-def compile_program(program):
-    assert False, "Not Implemented"
+def compile_program(program,output_file_path):
+    with open(output_file_path,"w") as out:      
+        out.write("segment .text\n")
+        out.write("global _start\n")
+        out.write("_start:\n")	     
+        out.write("    mov rax, 0\n")
+        out.write("    mov rdi, 0\n")
+        out.write("    syscall\n")
+    # assert False, "Not Implemented"
 
 
 program = [
@@ -87,7 +95,7 @@ def usage():
     print("   sim        Simulate The Program")
     print("SUBCOMMANDS: ")
 
-
+import subprocess
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         usage()
@@ -98,7 +106,10 @@ if __name__ == "__main__":
     if subcommand == "sim":
         simulate_program(program)
     elif subcommand == "com":
-        compile_program(program)
+        compile_program(program,'output.asm')
+        subprocess.call(["nasm","-felf64","output.asm"])
+        subprocess.call(["ld","-o","output","output.o"])
+
     else:
         usage()
         print("ERROR:  Unknown Subcommand %s" % (subcommand))
